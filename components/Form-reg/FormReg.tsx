@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
 import styled from './FormReg.module.scss'
 import { createUserWithEmailAndPassword, updateProfile, getAuth} from 'firebase/auth'
-import { app } from '@/app/layout';
+import { appAuth } from '@/app/layout';
 import { IUserData } from '../types';
 
 
@@ -20,7 +20,7 @@ export const FormReg:FC = () => {
 
 } as IUserData)
 
-  const auth = getAuth(app);
+  const auth = getAuth(appAuth);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

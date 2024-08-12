@@ -19,7 +19,7 @@ const firebaseConfig = {
 };
 
 
-export const app = initializeApp(firebaseConfig)
+export const appAuth = initializeApp(firebaseConfig)
 
 
 export default function RootLayout({
