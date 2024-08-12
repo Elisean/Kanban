@@ -1,0 +1,49 @@
+@import '../app/variables.scss';
+
+.wrapper{
+    background: $background;
+    color: #FFFFFF;
+    min-height: 100vh;
+}
+.container{
+    max-width: 1270px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+.inner{
+    position: absolute;
+    top: 50%;
+    left: 55%;
+    transform: translate(0%, -50%);
+}
+.bgImage{
+    background: url('../public/static/auth-page-background.png') no-repeat;
+    background-size: 50%;
+    min-height: 100vh;   
+}
+.button{
+    padding: 10px 25px;
+    font-size: 20px;
+    background-color: antiquewhite;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+.input{
+    padding: 0 20px;
+    margin:0 10px;
+    font-size: 20px;
+    border-radius: 10px;
+    border: 1px solid red;
+    outline: none;
+}
+.prompt{
+    font-size: 14px;
+    margin-top: 10px;
+}
+.prompt span{
+    text-decoration: underline;
+    color: #0075FF;
+    cursor: pointer;
+}

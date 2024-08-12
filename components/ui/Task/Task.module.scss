@@ -1,0 +1,48 @@
+.task{
+    background: #FFFFFF;
+    color: #072571;
+    display: inline-flex;
+    flex-direction: column;
+    width: 280px;
+    border-radius: 12px;
+    padding: 10px;
+    margin: 10px 0 20px 0;
+    word-wrap: break-word;
+    position: relative;
+    cursor: pointer;
+
+    &__description{
+        margin: 10px 0 0 0;
+    }
+    &__closed{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: transparent;
+        cursor: pointer;
+        font-size: 36px;
+        line-height: 20px;
+        transform: rotate(45deg);
+    }
+    &__modal{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        background: rgb(6,11,38);
+        background: linear-gradient(90deg, rgba(6,11,38,0.9429972672662815) 24%, rgba(26,31,55,0) 130%);
+        padding: 10px;
+        z-index: 2;
+        border-radius: 20px;
+    }
+    &__modalTitle{
+        font-size: 20px;
+        text-align: center;
+        line-height: 26px;
+        margin: 0 0 20px 0;
+    }
+}

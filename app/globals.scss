@@ -1,0 +1,28 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+ul,li{
+  list-style: none;
+}
+a{
+  text-decoration: none;
+  color: inherit;
+}
+button{
+  border:none;
+  outline:none;
+}
+input{
+  border:none;
+  outline:none;
+}
+.inner-form{
+  margin: 10px 0;
+}
+#sign-out{
+  width: 100px;
+  margin: 10px 20px;
+}
+

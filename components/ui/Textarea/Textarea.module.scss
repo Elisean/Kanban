@@ -1,0 +1,33 @@
+.textarea{
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background-color: transparent;
+    border: 2px solid #0075FF;
+    border-radius:20px;
+    padding: 10px 20px;
+    width: 100%;
+    resize: none;
+    outline: none;
+    height: 100px;
+    &::placeholder{
+        color: #0075FF;
+    }
+}   
+.textareaError{
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background-color: transparent;
+    border: 2px solid #E93636;
+    border-radius:20px;
+    padding: 10px 20px;
+    width: 100%;
+    resize: none;
+    outline: none;
+    height: 100px;
+    margin: 0;
+}
+.error{
+    color: #E93636;
+}
