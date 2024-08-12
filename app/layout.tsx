@@ -19,7 +19,7 @@ const firebaseConfig = {
 };
 
 
-export const appAuth = initializeApp(firebaseConfig)
+const appAuth = initializeApp(firebaseConfig)
 
 
 export default function RootLayout({
@@ -33,3 +33,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+export { appAuth };
