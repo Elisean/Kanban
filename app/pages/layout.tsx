@@ -9,6 +9,7 @@ import HomeIcon from '@/public/static/home.svg';
 import ProfileIcon from '@/public/static/profile.svg';
 import KanbanIcon from '@/public/static/kanban-board.svg';
 import SignOutIcon from '@/public/static/sign-out.svg';
+import UserIcon from '@/public/static/user.svg';
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/Button/Button";
@@ -134,9 +135,9 @@ function DasboardLayout({
                   <SignOutIcon/>
               </Button>
 
-              <div>
-                    <div>
-                        avatar
+              <div className={styles.aside__action_inner}>
+                    <div className={styles.aside__avatar}>
+                        <UserIcon/>
                     </div>
                     {userName ? <p>{userName}</p> : <p>Loading...</p>}
                   
