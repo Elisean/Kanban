@@ -15,7 +15,12 @@
     margin: 0 30px 0 30px;
     width: 100%;
 }
-
+.aside{
+    &__action_user{
+        display: flex;
+       
+    }
+}
 .aside__item{
     font-size: 16px;
     letter-spacing: 1px;

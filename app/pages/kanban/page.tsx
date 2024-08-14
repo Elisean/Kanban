@@ -7,12 +7,17 @@ import { TaskFields } from '@/components/Task-fields/TaskFields';
 import { nanoid } from 'nanoid';
 import { observer } from 'mobx-react-lite';
 import { Textarea } from '@/components/ui/Textarea/Textarea';
+import { getAuth } from 'firebase/auth';
+import { app } from '@/app/configs/firebase';
 
 
 
 const colors = ['#E93636', '#44AE41', '#1853E9', '#FF7A00', '#717171'];
 
 function Kanbanpage(){
+
+    const auth = getAuth(app);
+
 
     const [isOpen, setIsOpen] = useState(false);
     const [taskName, setTaskName] = useState<any>('');

@@ -3,11 +3,10 @@ import React, { FC, useState } from 'react'
 import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
 import styled from './FormReg.module.scss'
-import { createUserWithEmailAndPassword, updateProfile, getAuth} from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth} from 'firebase/auth'
 import { IUserData } from '../types';
 import { app } from '@/app/configs/firebase';
-
-
+import { getDatabase, ref, set } from 'firebase/database'
 
 export const FormReg:FC = () => {
 
@@ -19,16 +18,23 @@ export const FormReg:FC = () => {
 } as IUserData)
 
   const auth = getAuth(app);
+  const database = getDatabase(app);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
     try {
       const res = await createUserWithEmailAndPassword(
         auth,
         userData.userEmail,
-        userData.userPassword
+        userData.userPassword,
       );
+
+      await set(ref(database, 'users/' + res.user.uid), {
+        username: userData.userName,
+        email: userData.userEmail
+      });
+
     } catch (error) {
       console.log(error);
     }
@@ -41,8 +47,6 @@ export const FormReg:FC = () => {
 
   };
 
-    
-    
   return (
     <>
             <form onSubmit={handleSubmit} className={styled.form}>

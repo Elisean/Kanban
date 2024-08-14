@@ -9,6 +9,7 @@ const authProvider = (WrappedComponent: any) => {
     useEffect(() => {
       const auth = getAuth();
       const unsubscribe = onAuthStateChanged(auth, (user) => {
+ 
         if (!user) {
           router.push('/'); // Перенаправляем на страницу входа, если пользователь не аутентифицирован
         }

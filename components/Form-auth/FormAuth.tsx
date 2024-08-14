@@ -1,15 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
 import styles from './FormAuth.module.scss'
 import { IUserData } from '../types';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from "next/navigation"
-import { app } from '@/app/configs/firebase';
+import { app, database } from '@/app/configs/firebase';
+import { getDatabase, onValue, ref, set } from 'firebase/database';
+
+
 
 export const FormAuth = () => {
-
-
   const [userData, setUserData] = useState<IUserData>({
     userEmail: '',
     userPassword: ''
@@ -19,16 +20,30 @@ const auth = getAuth(app);
 
 const router = useRouter();
 
+const [userName, setUserName] = useState<string | null>(null);
+
+
+  const database = getDatabase(app);
+
+
 
   const handleAuth =  async (event: React.FormEvent<HTMLFormElement>) =>{
       event.preventDefault();
     
+
         try {
-            await signInWithEmailAndPassword(
+           const res =  await signInWithEmailAndPassword(
               auth,
               userData.userEmail, 
               userData.userPassword,
             )
+
+            await set(ref(database, 'users/' + res.user.uid), {
+              username: userData.userName,
+              email: userData.userEmail
+            });
+    
+
         } catch (error:any) {
             console.log(error.message)
         }
@@ -46,6 +61,7 @@ const router = useRouter();
       console.log('No user is signed insssss');
     }
   });
+
 
 
   return (

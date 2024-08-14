@@ -1,20 +1,21 @@
 "use client";
 import { usePathname } from "next/navigation";
-import styled from "./layout.module.scss";
-import { Header } from "@/components/Header/Header";
+import styles from "./layout.module.scss";
 import { Footer } from "@/components/Footer/Footer";
 import { Aside } from "@/components/Aside/Aside";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Link from "next/link";
-import { Logo } from "@/components/ui/Logo/Logo";
 import HomeIcon from '@/public/static/home.svg';
 import ProfileIcon from '@/public/static/profile.svg';
 import KanbanIcon from '@/public/static/kanban-board.svg';
+import SignOutIcon from '@/public/static/sign-out.svg';
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/Button/Button";
 import authProvider from "../providers/authProvider";
 import { app } from "../configs/firebase";
+import { getDatabase, ref, onValue } from 'firebase/database';
+import { useEffect, useState } from "react";
 
 
 
@@ -30,13 +31,17 @@ function DasboardLayout({
   children: React.ReactNode;
 }) {
 
+  const [userName, setUserName] = useState<string | null>(null);
+
   const pathname = usePathname();
   
   const router = useRouter();
 
-  const handleSignOut = async () => {
 
-    const auth = getAuth(app);
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+
+  const handleSignOut = async () => {
 
     try {
       await signOut(auth);
@@ -47,29 +52,41 @@ function DasboardLayout({
     }
   };
 
+  const user = auth.currentUser;
+
+    useEffect(() =>{
+      if (user) {
+      
+        const userRef = ref(database, 'users/' + user.uid);
+        onValue(userRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data && data.username) {
+            setUserName(data.username);
+          }
+        });
+      }
+
+    }, [auth, database])
+
   
 
   return (
     <main className={plusJakartaSansFonts.className}>
-      <section className={styled.wrapper}>
-        <Header>
-          <Logo />
-          <div className={styled.userPanel}>userPanel</div>
-        </Header>
-        <div className={styled.inner}>
+      <section className={styles.wrapper}>
+        <div className={styles.inner}>
           <Aside>
-            <ul className={styled.aside__list}>
-              <li className={styled.aside__item}>
+            <ul className={styles.aside__list}>
+              <li className={styles.aside__item}>
                 <Link
                   href={`/pages/dashboard`}
                   className={`${
                     pathname === `/pages/dashboard`
-                      ? `${styled.aside__item_active_link}`
-                      : `${styled.aside__item}`
+                      ? `${styles.aside__item_active_link}`
+                      : `${styles.aside__item}`
                   }`}
                 >
 
-                  <div className={styled.iconWrapper} style={pathname === '/pages/dashboard' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
+                  <div className={styles.iconWrapper} style={pathname === '/pages/dashboard' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
                     <HomeIcon />
                   </div>
                 
@@ -78,33 +95,33 @@ function DasboardLayout({
              
                 </Link>
               </li>
-              <li className={styled.aside__item}>
+              <li className={styles.aside__item}>
                 <Link
                   href={`/pages/kanban`}
                   className={`${
                     pathname === `/pages/kanban`
-                      ? `${styled.aside__item_active_link}`
-                      : `${styled.aside__item}`
+                      ? `${styles.aside__item_active_link}`
+                      : `${styles.aside__item}`
                   }`}
                 >
                 
-                  <div className={styled.iconWrapper} style={pathname === '/pages/kanban' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
+                  <div className={styles.iconWrapper} style={pathname === '/pages/kanban' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
                     <KanbanIcon />
                   </div>
 
                   Kanban
                 </Link>
               </li>
-              <li className={styled.aside__item}>
+              <li className={styles.aside__item}>
                 <Link
                   href={`/pages/profile`}
                   className={`${
                     pathname === `/pages/profile`
-                      ? `${styled.aside__item_active_link}`
-                      : `${styled.aside__item}`
+                      ? `${styles.aside__item_active_link}`
+                      : `${styles.aside__item}`
                   }`}
                 >
-                  <div className={styled.iconWrapper} style={pathname === '/pages/profile' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
+                  <div className={styles.iconWrapper} style={pathname === '/pages/profile' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
                     <ProfileIcon />
                   </div>
                 
@@ -112,12 +129,23 @@ function DasboardLayout({
                 </Link>
               </li>
             </ul>
-            <div>
-              <Button id='sign-out' type="button" onClick={handleSignOut}>SignOut</Button>
+            <div className={styles.aside__action_user}>
+              <Button id='sign-out' type="button" onClick={handleSignOut}>
+                  <SignOutIcon/>
+              </Button>
+
+              <div>
+                    <div>
+                        avatar
+                    </div>
+                    {userName ? <p>{userName}</p> : <p>Loading...</p>}
+                  
+              </div>
+
             </div>
              
           </Aside>
-          <div className={styled.container}>{children}</div>
+          <div className={styles.container}>{children}</div>
         </div>
         <Footer>Footer</Footer>
       </section>
