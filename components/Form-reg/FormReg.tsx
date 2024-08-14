@@ -4,15 +4,13 @@ import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
 import styled from './FormReg.module.scss'
 import { createUserWithEmailAndPassword, updateProfile, getAuth} from 'firebase/auth'
-import { appAuth } from '@/app/layout';
 import { IUserData } from '../types';
+import { app } from '@/app/configs/firebase';
 
 
 
 export const FormReg:FC = () => {
 
-
-  
   const [userData, setUserData] = useState<IUserData>({
     userName: '',
     userEmail: '',
@@ -20,7 +18,7 @@ export const FormReg:FC = () => {
 
 } as IUserData)
 
-  const auth = getAuth(appAuth);
+  const auth = getAuth(app);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,8 +32,6 @@ export const FormReg:FC = () => {
     } catch (error) {
       console.log(error);
     }
-
-
 
     setUserData({
       userName: '',

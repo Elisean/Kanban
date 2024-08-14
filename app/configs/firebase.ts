@@ -1,0 +1,14 @@
+import { initializeApp } from 'firebase/app';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyByIoZqQx4cPa-BU6H1bAFsCMBC6U7KMrQ",
+    authDomain: "kanban-board-ad650.firebaseapp.com",
+    projectId: "kanban-board-ad650",
+    storageBucket: "kanban-board-ad650.appspot.com",
+    messagingSenderId: "1005242560703",
+    appId: "1:1005242560703:web:d70f15b6250afea779160a"
+};
+  
+  
+  
+  export const app = initializeApp(firebaseConfig)

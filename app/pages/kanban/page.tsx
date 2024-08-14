@@ -15,15 +15,12 @@ const colors = ['#E93636', '#44AE41', '#1853E9', '#FF7A00', '#717171'];
 function Kanbanpage(){
 
     const [isOpen, setIsOpen] = useState(false);
-    const [taskName, setTaskName] = useState('');
+    const [taskName, setTaskName] = useState<any>('');
     const [taskDescription, setTaskDescription] = useState('');
     const [color, setColor] = useState('');
     const [inputError, setInputError] = useState('');
     const [textareaError, setTextareaError] = useState('');
     const modalRef = useRef<HTMLFormElement>(null);
-
-
-   
 
 
     const handleClickOutside = (event: React.MouseEvent<HTMLElement>) => {
@@ -109,22 +106,23 @@ function Kanbanpage(){
                 isOpen && (
                     <form className={styled.formWindow} onSubmit={formSubmit} ref={modalRef}>
                         <div className={styled.formInputs}>
-                            <Input type='text' name='name' placeholder='Task name' onChange={(event)=> setTaskName(event.target.value)} error={inputError}/>
-                            <Textarea name='description' placeholder='Task description' textChange={(event)=> setTaskDescription(event.target.value)} error={textareaError}></Textarea>
+                            <Input type='text' id='name' label='name' placeholder='Task name' onChange={(event)=> setTaskName(event.target.value)} error={inputError} value={taskName}/>
+                            <Textarea label='description' placeholder='Task description' textChange={(event)=> setTaskDescription(event.target.value)} error={textareaError} value={taskDescription}></Textarea>
                         </div>
-                    <div className={styled.formAction}>
-                        <div className={styled.actionColors}>
-                            {
-                                colors.map((color:string, id:number) =>{
-                                   return <div className={styled.actionColor} key={id} style={{ backgroundColor: color }} onClick={()=> setColor(color)}></div>
-                                })
-                            }
-                        </div>
-                        <Button>
-                          Add card
-                        </Button>
 
-                    </div>
+                        <div className={styled.formAction}>
+                            <div className={styled.actionColors}>
+                                {
+                                    colors.map((color:string, id:number) =>{
+                                    return <div className={styled.actionColor} key={id} style={{ backgroundColor: color }} onClick={()=> setColor(color)}></div>
+                                    })
+                                }
+                            </div>
+                            <Button>
+                            Add card
+                            </Button>
+
+                        </div>
                       
                     </form>
                 )

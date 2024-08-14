@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/Button/Button';
 import styles from './FormAuth.module.scss'
 import { IUserData } from '../types';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
-import { appAuth } from '@/app/layout';
 import { useRouter } from "next/navigation"
+import { app } from '@/app/configs/firebase';
 
 export const FormAuth = () => {
 
@@ -15,7 +15,7 @@ export const FormAuth = () => {
     userPassword: ''
 } as IUserData)
 
-const auth = getAuth(appAuth);
+const auth = getAuth(app);
 
 const router = useRouter();
 

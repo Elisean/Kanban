@@ -12,9 +12,9 @@ import ProfileIcon from '@/public/static/profile.svg';
 import KanbanIcon from '@/public/static/kanban-board.svg';
 import { getAuth, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation"
-import { app } from "../layout";
 import { Button } from "@/components/ui/Button/Button";
 import authProvider from "../providers/authProvider";
+import { app } from "../configs/firebase";
 
 
 
