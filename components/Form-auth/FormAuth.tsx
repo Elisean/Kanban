@@ -5,8 +5,8 @@ import styles from './FormAuth.module.scss'
 import { IUserData } from '../types';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from "next/navigation"
-import { app, database } from '@/app/configs/firebase';
-import { getDatabase, onValue, ref, set } from 'firebase/database';
+import { app } from '@/app/configs/firebase';
+
 
 
 
@@ -20,29 +20,15 @@ const auth = getAuth(app);
 
 const router = useRouter();
 
-const [userName, setUserName] = useState<string | null>(null);
-
-
-  const database = getDatabase(app);
-
-
-
   const handleAuth =  async (event: React.FormEvent<HTMLFormElement>) =>{
       event.preventDefault();
-    
-
         try {
-           const res =  await signInWithEmailAndPassword(
+         await signInWithEmailAndPassword(
               auth,
               userData.userEmail, 
               userData.userPassword,
             )
 
-            await set(ref(database, 'users/' + res.user.uid), {
-              username: userData.userName,
-              email: userData.userEmail
-            });
-    
 
         } catch (error:any) {
             console.log(error.message)
