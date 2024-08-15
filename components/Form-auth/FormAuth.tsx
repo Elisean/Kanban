@@ -16,6 +16,7 @@ export const FormAuth = () => {
     userPassword: ''
 } as IUserData)
 
+
 const auth = getAuth(app);
 
 const router = useRouter();
@@ -40,6 +41,8 @@ const router = useRouter();
         })
   }
 
+
+
   onAuthStateChanged(auth, (user) => {
     if (user) {
       router.push('pages/dashboard'); 
@@ -47,6 +50,7 @@ const router = useRouter();
       console.log('No user is signed insssss');
     }
   });
+  
 
 
 

@@ -6,6 +6,7 @@ const authProvider = (WrappedComponent: any) => {
   const WithAuth = (props:any) => {
     const router = useRouter();
 
+
     useEffect(() => {
       const auth = getAuth();
       const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -14,6 +15,8 @@ const authProvider = (WrappedComponent: any) => {
           router.push('/'); // Перенаправляем на страницу входа, если пользователь не аутентифицирован
         }
       });
+
+    
 
       return () => unsubscribe();
     }, [router]);

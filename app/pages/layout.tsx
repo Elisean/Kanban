@@ -1,7 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
 import styles from "./layout.module.scss";
-import { Footer } from "@/components/Footer/Footer";
 import { Aside } from "@/components/Aside/Aside";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Link from "next/link";
@@ -11,12 +9,15 @@ import KanbanIcon from '@/public/static/kanban-board.svg';
 import SignOutIcon from '@/public/static/sign-out.svg';
 import UserIcon from '@/public/static/user.svg';
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button/Button";
 import authProvider from "../providers/authProvider";
 import { app } from "../configs/firebase";
-import { getDatabase, ref, onValue } from 'firebase/database';
 import { useEffect, useState } from "react";
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import Image from 'next/image'
+
+
 
 const plusJakartaSansFonts = Plus_Jakarta_Sans({
   subsets: ["latin", "cyrillic-ext"],
@@ -31,9 +32,11 @@ function DasboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const auth = getAuth(app);
-  const database = getDatabase(app);
-  const [user, setUser] = useState<any>(null)
+  const storage = getStorage()
+  
 
+  const [user, setUser] = useState<any>(null)
+  const [imageUrl, setImageUrl] = useState('')
 
 
   useEffect(() => {
@@ -46,9 +49,27 @@ function DasboardLayout({
       )
     });
 
-    // Cleanup function to unsubscribe from auth state changes
+
     return () => unsubscribeAuth();
-  }, [auth, database, user]);
+  }, [auth]);
+
+
+
+  useEffect(() => {
+      
+    const fetchImageUrl = async () => {
+      const storageRef = ref(storage, 'avatar.jpg');
+      try {
+        await getDownloadURL(storageRef);
+        const url = await getDownloadURL(storageRef);
+        setImageUrl(url);
+      } catch (error) {
+        console.error('Image does not exist or there was an error:', error);
+      }
+    };
+    fetchImageUrl();
+  }, [storage]);
+
 
 
 
@@ -60,6 +81,9 @@ function DasboardLayout({
       console.error('Error signing out:', error);
     }
   };
+
+
+ 
 
   return (
     <main className={plusJakartaSansFonts.className}>
@@ -118,16 +142,17 @@ function DasboardLayout({
                 <SignOutIcon />
               </Button>
               <div className={styles.aside__action_inner}>
-                <div className={styles.aside__avatar}>
-                  <UserIcon />
-                </div>
+                 <Link href={`/pages/profile`} className={styles.aside__avatar}>
+                 {
+                  imageUrl ? <Image src={imageUrl} alt='avatar' width={50} height={50}/> :  <UserIcon /> 
+                 } 
+                 </Link>
                 {user ? <p>{user.name}</p> : <p>Loading...</p>}
               </div>
             </div>
           </Aside>
           <div className={styles.container}>{children}</div>
         </div>
-        <Footer>Footer</Footer>
       </section>
     </main>
   );

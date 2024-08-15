@@ -3,10 +3,10 @@ import React, { FC, useState } from 'react'
 import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
 import styled from './FormReg.module.scss'
-import { createUserWithEmailAndPassword, getAuth, updateProfile} from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, updateProfile} from 'firebase/auth'
 import { IUserData } from '../types';
 import { app } from '@/app/configs/firebase';
-import { getDatabase, ref, set } from 'firebase/database'
+import { useRouter, usePathname } from 'next/navigation';
 
 export const FormReg:FC = () => {
 
@@ -18,6 +18,10 @@ export const FormReg:FC = () => {
 } as IUserData)
 
   const auth = getAuth(app);
+
+  const router = useRouter();
+
+  const pathName = usePathname()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,11 +36,13 @@ export const FormReg:FC = () => {
         displayName: userData.userName
       });
 
-      
-
     } catch (error) {
       console.log(error);
     }
+
+    onAuthStateChanged(auth, () => {
+      router.push('pages/dashboard'); 
+    });
 
     setUserData({
       userName: '',
@@ -44,7 +50,13 @@ export const FormReg:FC = () => {
       userPassword: ''
   })
 
+
+  
+
   };
+  
+
+  
 
   return (
     <>
