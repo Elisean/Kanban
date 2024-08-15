@@ -1,10 +1,34 @@
-import { storage } from './firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
 
-async function uploadImage(file: File) {
-  const storageRef = ref(storage, file.name);
+const storage = getStorage();
+const auth = getAuth();
+
+
+export const uploadUserImage = async (file:any) => {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+  const userId = user.uid;
+  const storageRef = ref(storage, `users/${userId}/avatar.jpg`);
   await uploadBytes(storageRef, file);
-  return await getDownloadURL(storageRef);
-}
+  const url = await getDownloadURL(storageRef);
+  return url;
+};
 
-export default uploadImage;
+
+export const getUserImageURL = async (userId: string) => {
+  const storageRef = ref(storage, `users/${userId}/avatar.jpg`);
+  try {
+    const url = await getDownloadURL(storageRef);
+    return url;
+  } catch (error: any) {
+    if (error.code === 'storage/object-not-found') {
+      console.log('Image does not exist.');
+    } else {
+      console.error('There was an error fetching the image:', error);
+    }
+    return null;
+  }
+};

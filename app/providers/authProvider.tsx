@@ -16,8 +16,7 @@ const authProvider = (WrappedComponent: any) => {
         }
       });
 
-    
-
+  
       return () => unsubscribe();
     }, [router]);
 
@@ -27,4 +26,21 @@ const authProvider = (WrappedComponent: any) => {
   return WithAuth;
 };
 
+
+
+export const checkUserAuthentication = (callback:any) => {
+  const auth = getAuth()
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      callback(user);
+    } else {
+      callback(null);
+    }
+  });
+};
+
+
+
+
 export default authProvider;
+

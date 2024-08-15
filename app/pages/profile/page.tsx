@@ -4,17 +4,13 @@ import styles from './profile.module.scss';
 import Image from 'next/image'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { app } from '@/app/configs/firebase';
-import uploadImage from '../../configs/uploadImageFireBase';
-
-
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { uploadUserImage, getUserImageURL } from '../../configs/uploadImageFireBase'; 
+import { checkUserAuthentication } from '@/app/providers/authProvider';
 
 function Userpage(){
     const [user, setUser] = useState<any>(null)
     const [imageUrl, setImageUrl] = useState('');
     const auth = getAuth(app);
-
-  const storage = getStorage()
 
 
     useEffect(() => {
@@ -31,34 +27,32 @@ function Userpage(){
       }, [auth]);
     
       
-        const handleFileChange = async (event:any) => {
-          const file = event.target.files[0];
-          if (file) {
-            const url = await uploadImage(file);
-            setImageUrl(url);
-          }
-          return file
-        };
+      const handleFileChange = async (event:any) => {
+        const file = event.target.files[0];
+        if (file) {
+          const url = await uploadUserImage(file);
+          setImageUrl(url);
+          window.location.reload();
+        }
+      };
   
-
-
-
-        useEffect(() => {
-      
-          const fetchImageUrl = async () => {
-            const storageRef = ref(storage, 'avatar.jpg');
-            try {
-              await getDownloadURL(storageRef);
-              const url = await getDownloadURL(storageRef);
+  
+      useEffect(() => {
+        const fetchImage = async (user:any) => {
+          if (user) {
+            const url = await getUserImageURL(user.uid);
+            if (url) {
               setImageUrl(url);
-            } catch (error) {
-              console.error('Image does not exist or there was an error:', error);
             }
-          };
-          fetchImageUrl();
-        }, [storage]);
-      
-       
+          }
+        };
+    
+        checkUserAuthentication(setUser);
+        fetchImage(auth.currentUser);
+      }, [user]);
+
+
+     
  
     return (
         <section className={styles.userPage}>
@@ -67,8 +61,6 @@ function Userpage(){
             <div className={styles.userWraper}>
                 <div className={styles.userAvatar}>
 
-          
-                 
                   <label htmlFor="file" className={styles.imageWrapper}>
                     <input type="file" id='file' className={styles.inputFile} onChange={handleFileChange} />
                     {imageUrl ?  <Image src={imageUrl} alt='avatar' width={140} height={140}/> : <Image src="/static/first-user-avatar.png" alt='avatar' width={140} height={140}/> } 
@@ -77,7 +69,7 @@ function Userpage(){
 
                 </div>
                 <h2 className={styles.userName}>
-                    {user ? <p>{user.name}</p> : <p>Loading...</p>}
+                    {user ? <p>{user.displayName}</p> : <p>Loading...</p>}
                 </h2>
                 <div className={styles.userInner}>
                     <div className={styles.userHistory}>

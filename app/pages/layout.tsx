@@ -11,12 +11,11 @@ import UserIcon from '@/public/static/user.svg';
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/Button/Button";
-import authProvider from "../providers/authProvider";
+import authProvider, { checkUserAuthentication } from "../providers/authProvider";
 import { app } from "../configs/firebase";
 import { useEffect, useState } from "react";
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import Image from 'next/image'
-
+import {getUserImageURL } from '../configs/uploadImageFireBase'; 
 
 
 const plusJakartaSansFonts = Plus_Jakarta_Sans({
@@ -29,14 +28,15 @@ function DasboardLayout({
   children: React.ReactNode;
 }) {
   
+  const [user, setUser] = useState<any>(null)
+  const [imageUrl, setImageUrl] = useState('')
+  
   const pathname = usePathname();
   const router = useRouter();
   const auth = getAuth(app);
-  const storage = getStorage()
+
   
 
-  const [user, setUser] = useState<any>(null)
-  const [imageUrl, setImageUrl] = useState('')
 
 
   useEffect(() => {
@@ -48,39 +48,35 @@ function DasboardLayout({
         } : null
       )
     });
-
-
     return () => unsubscribeAuth();
   }, [auth]);
 
 
 
-  useEffect(() => {
-      
-    const fetchImageUrl = async () => {
-      const storageRef = ref(storage, 'avatar.jpg');
-      try {
-        await getDownloadURL(storageRef);
-        const url = await getDownloadURL(storageRef);
-        setImageUrl(url);
-      } catch (error) {
-        console.error('Image does not exist or there was an error:', error);
-      }
-    };
-    fetchImageUrl();
-  }, [storage]);
-
-
-
-
   const handleSignOut = async () => {
     try {
+     window.location.reload()
       await signOut(auth);
       router.push('/');
+     
     } catch (error) {
       console.error('Error signing out:', error);
     }
   };
+
+  useEffect(() => {
+    const fetchImage = async (user:any) => {
+      if (user) {
+        const url = await getUserImageURL(user.uid);
+        if (url) {
+          setImageUrl(url);
+        }
+      }
+    };
+
+    checkUserAuthentication(setUser);
+    fetchImage(auth.currentUser);
+  }, [user]);
 
 
  
@@ -147,7 +143,7 @@ function DasboardLayout({
                   imageUrl ? <Image src={imageUrl} alt='avatar' width={50} height={50}/> :  <UserIcon /> 
                  } 
                  </Link>
-                {user ? <p>{user.name}</p> : <p>Loading...</p>}
+                {user ? <p>{user.displayName}</p> : <p>Loading...</p>}
               </div>
             </div>
           </Aside>
