@@ -18,6 +18,17 @@
     margin: 10px 0 0 0;
     padding: 0 0 10px 0; 
     border-bottom: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg{
+        width: 20px;
+        height: 20px;
+        color: #FFFFFF;
+        margin: 3px 0 0 5px;
+        cursor: pointer;
+    }
 }
 .userInner{
     display: flex;
@@ -56,4 +67,25 @@
     height: 100%;
     opacity: 0;
     visibility: hidden;
+}
+.replaceWrapper{
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+.replaceName{
+    display: flex;
+    align-items: center;
+}
+.checkButton{
+    margin: 20px 0 0 5px;
+    cursor: pointer;
+}
+.currentPassword{
+    display: flex;
+    align-items: center;
+}
+.replacePassword{
+    display: flex;
+    align-items: center;
 }
