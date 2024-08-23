@@ -1,100 +1,103 @@
-import { useEffect, useState } from 'react'
-import styled from './TaskFields.module.scss'
-import { Task } from '../ui/Task/Task'
+'use client'
+
+import { useEffect, useState } from 'react';
+import styles from './TaskFields.module.scss'
 import { observer } from 'mobx-react-lite';
-import kanbanStore from '@/app/Store/kanbanStore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getDatabase, onValue, ref as dbRef } from 'firebase/database';
+import { Task } from '../ui/Task/Task';
 
 
-interface Itask{
-    name:string;
-    task:string;
-    id:string;
-    bgColor:string
+
+interface Task{
+    task:string
+    index:string
+    taskId: string;
+    taskDescription: string;
+    taskName: string;
 }
 
 
 export const TaskFields:React.FC = observer(() =>{
-  
-    const [startedTasks, setStartedTasks] = useState<Itask[]>([]);
 
-    const [progressTasks, setProgressTasks] = useState<Itask[]>([]);
+    const [startedTasks, setStartedTasks] = useState<Task[]>([]);
 
-    const [doneTask, setDoneTask] = useState<Itask[]>([])
+    const [progressTasks, setProgressTasks] = useState<Task[]>([]);
 
-    
+    const [doneTask, setDoneTask] = useState<Task[]>([])
+
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            const inStartedTask = localStorage.getItem('inStartedTask');
-            
-            const inProgressTasks = localStorage.getItem('inProgressTask') || '[]';
-
-            const inDoneTask = localStorage.getItem('inDoneTask') || '[]';
-
-
-            if(inProgressTasks){
-                const parsedProgressTasks = JSON.parse(inProgressTasks);
-                setProgressTasks(parsedProgressTasks);
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const db = getDatabase();
+                const userId = user.uid;
+                const tasksRef = dbRef(db, `tasks/${userId}`);
+                onValue(tasksRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        const tasksList = Object.keys(data).map(key => ({
+                            ...data[key]
+                        }));
+                        setStartedTasks(tasksList);
+                    } else {
+                        setStartedTasks([]);
+                    }
+                });
+            } else {
+                setStartedTasks([]);
             }
-    
-            if (inStartedTask) {
-                const parsedTasks = JSON.parse(inStartedTask);
-                setStartedTasks(parsedTasks);
-            }
-            if (inDoneTask) {
-                const parsedDoneTasks = JSON.parse(inDoneTask);
-                setDoneTask(parsedDoneTasks);
-            }
-         
-        }, 1000); // Проверяем данные каждую секунду
-    
-        // Чистим интервал при размонтировании компонента
-        return () => clearInterval(intervalId);
+        });
     }, []);
 
 
-    // Рендеринг списка задач
+
     return (
-        <div className={styled.taskFieldsWrapper}>
-            <ul className={styled.taskList} id='dragStartField' onDragOver={(event) => event.preventDefault()} onDrop={(event)=> kanbanStore.handleTask(event)}>
-                {startedTasks.map((task, index) => (
-                    <Task 
-                        bgColor={task.bgColor}
-                        name={task.name} 
-                        task={task.task} 
-                        id={task.id}
-                        key={index}
-                        draggable
-                    />
-                ))}
-            </ul>
-            <ul className={styled.taskList} id='dragProgressField' onDragOver={(event) => event.preventDefault()} onDrop={(event)=> kanbanStore.handleTask(event)}>
-            {progressTasks.map((task, index) => (
-                    <Task 
-                        bgColor={task.bgColor}
-                        name={task.name} 
-                        task={task.task} 
-                        id={task.id}
-                        key={index}
-                        draggable
-                    />
-                ))}
-            </ul>
-            <ul className={styled.taskList} id='dragDoneField' onDragOver={(event) => event.preventDefault()} onDrop={(event)=> kanbanStore.handleTask(event)}>
-            {doneTask.map((task, index) => (
-                    <Task 
-                        bgColor={task.bgColor}
-                        name={task.name} 
-                        task={task.task} 
-                        id={task.id}
-                        key={index}
-                        draggable
-                    />
-                ))}
-            </ul>
-            <ul className={styled.taskList}>
-      
-            </ul>
-        </div>
+
+            <div className={styles.kanbanFields}>
+
+                <ul className={styles.kanbanFields__field}>
+                      <p className={styles.kanbanFields__titles}>In started</p>
+
+                      {startedTasks?.map((task, index) => (
+                        <Task
+                            key={index} 
+                            id={task.taskId}
+                            taskDescription={task.taskDescription}
+                            taskName={task.taskName}
+                            draggable
+                        />
+                    ))}
+
+                </ul>
+
+                <ul className={styles.kanbanFields__field}>
+                      <p className={styles.kanbanFields__titles}>In progress</p>
+                      {progressTasks?.map((task, index) => (
+                        <Task
+                            key={index} 
+                            id={task.taskId}
+                            taskDescription={task.taskDescription}
+                            taskName={task.taskName}
+                            draggable
+                        />
+                    ))}
+                </ul>
+
+                <ul className={styles.kanbanFields__field}>
+                      <p className={styles.kanbanFields__titles}>Done</p>
+                      {doneTask?.map((task, index) => (
+                        <Task
+                            key={index} 
+                            id={task.taskId}
+                            taskDescription={task.taskDescription}
+                            taskName={task.taskName}
+                            draggable
+                        />
+                    ))}
+                </ul>
+
+            </div>
       
     );
 })

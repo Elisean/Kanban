@@ -153,9 +153,6 @@ function Userpage() {
                   </div>
 
                 </label>
-
-
-                
               )
             }
 

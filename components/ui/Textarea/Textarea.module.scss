@@ -3,15 +3,15 @@
     font-weight: 700;
     color: #FFFFFF;
     background-color: transparent;
-    border: 2px solid #0075FF;
-    border-radius:20px;
+    border: 2px solid #837d7993;
+    border-radius:10px;
     padding: 10px 20px;
     width: 100%;
     resize: none;
     outline: none;
     height: 100px;
     &::placeholder{
-        color: #0075FF;
+        color: #A0AEC0;
     }
 }   
 .textareaError{
@@ -20,13 +20,17 @@
     color: #FFFFFF;
     background-color: transparent;
     border: 2px solid #E93636;
-    border-radius:20px;
+    border-radius:10px;
     padding: 10px 20px;
     width: 100%;
     resize: none;
     outline: none;
     height: 100px;
     margin: 0;
+}
+.label{
+    color: #A0AEC0;
+    font-size: 14px;
 }
 .error{
     color: #E93636;

@@ -1,139 +1,138 @@
 'use client'
-import { Button } from '@/components/ui/Button/Button';
-import styled from './kanban.module.scss'
-import { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import styles from './kanban.module.scss';
 import { Input } from '@/components/ui/Input/Input';
-import { TaskFields } from '@/components/Task-fields/TaskFields';
-import { nanoid } from 'nanoid';
-import { observer } from 'mobx-react-lite';
 import { Textarea } from '@/components/ui/Textarea/Textarea';
-import { getAuth } from 'firebase/auth';
-import { app } from '@/app/configs/firebase';
+import { Button } from '@/components/ui/Button/Button';
+import { getDatabase, ref as dbRef, push, set } from "firebase/database";
+import { getAuth } from 'firebase/auth'
+import { TaskFields } from '@/components/Task-fields/TaskFields';
 
-
-
-const colors = ['#E93636', '#44AE41', '#1853E9', '#FF7A00', '#717171'];
-
-function Kanbanpage(){
-
-    const auth = getAuth(app);
-
-
+function Kanbanpage() {
     const [isOpen, setIsOpen] = useState(false);
-    const [taskName, setTaskName] = useState<any>('');
-    const [taskDescription, setTaskDescription] = useState('');
-    const [color, setColor] = useState('');
-    const [inputError, setInputError] = useState('');
-    const [textareaError, setTextareaError] = useState('');
-    const modalRef = useRef<HTMLFormElement>(null);
+    const modalRef = useRef<any>(null);
+    const auth = getAuth();
 
+    const [tasks, setTasks] = useState<any>({
+        taskName: '',
+        taskDescription: ''
+    });
 
-    const handleClickOutside = (event: React.MouseEvent<HTMLElement>) => {
-        if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event: any) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
             setIsOpen(false);
-          }
+        }
     };
+
     useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside as any);
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside as any);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
-  
-    const openTaskWindow = () =>{
-        setIsOpen(!isOpen)
-    }
-    const formSubmit = (event: React.FormEvent<HTMLFormElement>) =>{
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const id = nanoid(3)
-      
-        const newTask = {id:id, name: taskName, task: taskDescription, bgColor: color };
-       
-        // Получаем текущие задачи из localStorage или инициализируем новый массив
-        const startedTask = JSON.parse(localStorage.getItem("inStartedTask") || "[]");
-        const progressTask = JSON.parse(localStorage.getItem("inProgressTask") || "[]");
-        const doneTask = JSON.parse(localStorage.getItem("inDoneTask") || "[]");
 
- 
-
-        if(!taskName && !taskDescription){
-            return false
-        }else if(!taskName){
-
-            if(!taskName){
-                setInputError('Empty field')
-            }
-            return false
-        }else if(!taskDescription){
-           
-            if(!taskDescription){
-                setTextareaError('Empty field');
-            }
-
-            return false
-        }else{
-            // Добавляем новую задачу в массив
-            startedTask.push(newTask);
-            setTaskName('');
-            setTaskDescription('');
-            setTextareaError('');   
-            setInputError('');   
+        if (!tasks.taskName || !tasks.taskDescription) {
+            console.error("Task name or task description is undefined");
+            return;
         }
-    
-        // Сохраняем обновленный массив обратно в localStorage
-        localStorage.setItem("inStartedTask", JSON.stringify(startedTask));
-        localStorage.setItem("inProgressTask", JSON.stringify(progressTask));
-        localStorage.setItem("inDoneTask", JSON.stringify(doneTask));
 
-    
-        // Закрываем окно
-        setIsOpen(!isOpen);
-      
-    }
-  
+        if (!auth.currentUser) {
+            console.error('User is not authenticated');
+            return;
+        }
+
+        try {
+            const db = getDatabase();
+            const userId = auth.currentUser.uid;
+            const taskRef = push(dbRef(db, `tasks/${userId}`));
+            await set(taskRef, {
+                taskId: taskRef.key,
+                taskName: tasks.taskName,
+                taskDescription: tasks.taskDescription,
+                createdAt: new Date().toISOString(),
+            });
+            setIsOpen(false);
+        } catch (error) {
+            console.error('Error creating task: ', error);
+        }
+    };
+
     return (
-        <section className={styled.kanban}>
-            <p>Board</p>
-            
-            <ul className={styled.kanban__inner}>
-                <li className={styled.kanban__item}>In started {}</li>
-                <li className={styled.kanban__item}>In progress {}</li>
-                <li className={styled.kanban__item}>Done {}</li>
-                <li className={styled.kanban__item}>+</li>
-            </ul>
-            <TaskFields />
-            <Button onClick={()=> openTaskWindow()}>
-                <div>Add task</div>
-                <div className={styled.buttonPlus}>+</div>
-            </Button>
-            {
-                isOpen && (
-                    <form className={styled.formWindow} onSubmit={formSubmit} ref={modalRef}>
-                        <div className={styled.formInputs}>
-                            <Input type='text' id='name' label='name' placeholder='Task name' onChange={(event)=> setTaskName(event.target.value)} error={inputError} value={taskName}/>
-                            <Textarea label='description' placeholder='Task description' textChange={(event)=> setTaskDescription(event.target.value)} error={textareaError} value={taskDescription}></Textarea>
-                        </div>
+        <div className={styles.kanban}>
+            <div className={styles.kanban__wrapper}>
+                <p>Board</p>
+                <TaskFields />
+                <Button id='add-card' onClick={() => setIsOpen(!isOpen)}>Add card</Button>
+            </div>
 
-                        <div className={styled.formAction}>
-                            <div className={styled.actionColors}>
-                                {
-                                    colors.map((color:string, id:number) =>{
-                                    return <div className={styled.actionColor} key={id} style={{ backgroundColor: color }} onClick={()=> setColor(color)}></div>
-                                    })
-                                }
-                            </div>
-                            <Button>
-                            Add card
-                            </Button>
-
-                        </div>
-                      
-                    </form>
-                )
-            }
-        </section>
-    )
+            {isOpen && (
+                <form action="#" className={styles.kanban__window} ref={modalRef} onSubmit={handleSubmit}>
+                    <Input type='text' id='task-name-input' placeholder='Task name' value={tasks.taskName} onChange={event => setTasks({ ...tasks, taskName: event.target.value })} />
+                    <Textarea id='task-description-input' placeholder='Task description' value={tasks.taskDescription} textChange={event => setTasks({ ...tasks, taskDescription: event.target.value })} />
+                    <Button id='add-task' type='submit'>Add task</Button>
+                </form>
+            )}
+        </div>
+    );
 }
 
-export default observer(Kanbanpage)
+export default Kanbanpage;
+
+
+
+// return (
+//     <div className={styles.kanban}>
+//     <div className={styles.kanban__wrapper}>
+//         <p>Board</p>
+       
+//         <ul className={styles.kanban__fields}>
+
+
+//             <div className={styles.kanban__field} onDragOver={(event) => event.preventDefault()}>
+
+//                 <p className={styles.kanban__fields_title}>In started</p>
+//                 {inStartedTasks.map(task => (
+//                     <li key={task.id} className={styles.kanban__field_task} draggable>
+//                         <strong>{task.taskName}</strong>
+//                         <p>{task.taskDescription}</p>
+//                     </li>
+//                 ))}
+
+//             </div>
+            
+//             <div className={styles.kanban__field} onDragOver={(event) => event.preventDefault()} >
+//                 <p className={styles.kanban__fields_title}>In progress</p>
+//                 {inProgressTasks.map(task => (
+//                     <li key={task.id} className={styles.kanban__field_task}  draggable>
+//                         <strong>{task.taskName}</strong>
+//                         <p>{task.taskDescription}</p>
+//                     </li>
+//                 ))}
+//             </div>
+
+//             <div className={styles.kanban__field} onDragOver={(event) => event.preventDefault()} >
+//                 <p className={styles.kanban__fields_title}>Done</p>
+//                 {doneTasks.map(task => (
+//                     <li key={task.id} className={styles.kanban__field_task}  draggable>
+//                         <strong>{task.taskName}</strong>
+//                         <p>{task.taskDescription}</p>
+//                     </li>
+//                 ))}
+//             </div>
+//         </ul>
+
+//         <Button id='add-card' onClick={() => setIsOpen(!isOpen)}>Add card</Button>
+//     </div>
+
+//     {isOpen && (
+//             <form action="#" className={styles.kanban__window} ref={modalRef} onSubmit={handleSubmit}>      
+//                 <Input type='text' id='task-name-input' placeholder='Task name' value={tasks.taskName} onChange={event => setTasks({...tasks, taskName:event.target.value})}/>
+//                 <Textarea id='task-description-input' placeholder='Task description' value={tasks.taskDescription} textChange={event => setTasks({...tasks, taskDescription:event.target.value})} />
+//                 <Button id='add-task' type='submit'>Add task</Button>
+//             </form>
+//     )}
+// </div>
+// );

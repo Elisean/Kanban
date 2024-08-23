@@ -1,113 +1,33 @@
-import { action, makeAutoObservable, observable } from "mobx";
+import { action, makeAutoObservable } from "mobx";
+import { getDatabase, ref, remove } from 'firebase/database';
+import { getAuth } from "firebase/auth";
 
-type Task = {
-    id: string;
-    name: string;
-    bgColor: string;
-    task: string;
-}
 
 class KanbanStore {
 
-    id:string = '';
-    @observable storage:string | null = '';
-    @observable dynamicStateStorage:string | null = '';
-    @observable inStartedTask:any;
-    @observable inProgressTask:any;
-    @observable inDoneTask:any;
-    @observable prevStateStorage:string | null = '';
-    
     constructor(){
-        makeAutoObservable(this)
+        makeAutoObservable(this);
     }
 
-    @action getTask(id:string, storage:string | null, dynamicStateStorage:string | null, prevStateStorage:string | null){
-        this.id = id
-        this.storage = storage
-        this.dynamicStateStorage = dynamicStateStorage
-        this.inStartedTask = JSON.parse(localStorage.getItem("inStartedTask") || '[]')
-        this.inProgressTask = JSON.parse(localStorage.getItem("inProgressTask") || '[]')
-        this.inDoneTask = JSON.parse(localStorage.getItem("inDoneTask") || '[]')
-        this.prevStateStorage = prevStateStorage
-    }
-
-    @action handleTask(event: any) {
-       
-        switch (event.nativeEvent.target.id) {
-            case 'dragStartField':
-
-            const newStartItem:Task[] = [];
-
-            const newStartState = JSON.parse(this.dynamicStateStorage ?? '[]').filter((task:{id:string, name:string, bgColor:string, task:string})=>{
-                if (task.id === this.id) {
-                    newStartItem.push(task);
-                    return false; // Убираем элемент из newTask
+    @action async deleteTask(id: string) {
+        if (id) {
+            try {
+                const auth = getAuth(); // получение авторизации юзреа
+                if (!auth.currentUser) {
+                    return;
                 }
-                    return true; // Оставляем элемент в newTask
-              });
-
-            const currentInStartTask = JSON.parse(localStorage.getItem("inStartedTask") || '[]');
-            const updatedInStartTask = [...currentInStartTask, ...newStartItem];
-
-            this.storage = 'inStartedTask'
-            localStorage.setItem(this.prevStateStorage ?? '', JSON.stringify(newStartState));
-            localStorage.setItem(this.storage, JSON.stringify(updatedInStartTask));
-            break; 
-            
-            case 'dragProgressField':
-
-                const newProgressItem:Task[] = [];
-               
-              const newProgressState = JSON.parse(this.dynamicStateStorage ?? '[]').filter((task:{id:string, name:string, bgColor:string, task:string})=>{
-                if (task.id === this.id) {
-                    newProgressItem.push(task);
-                    return false; // Убираем элемент из newTask
-                }
-                    return true; // Оставляем элемент в newTask
-              });
+                const db = getDatabase(); // получение бд авторизованного юзера
+                const userId = auth.currentUser.uid; // получение авторизованного юзера
              
-              const currentInProgressTask = JSON.parse(localStorage.getItem("inProgressTask") || '[]');
-              const updatedInProgressTask = [...currentInProgressTask, ...newProgressItem];
+                const taskRef = ref(db, `tasks/${userId}/${id}`); // получение ссылки на удаление таски
+                await remove(taskRef); // удаления таски из базы данных
        
-              this.storage = 'inProgressTask'
-
-              localStorage.setItem(this.prevStateStorage ?? '', JSON.stringify(newProgressState));
-              localStorage.setItem(this.storage, JSON.stringify(updatedInProgressTask));
-           
-            break;
-
-            case 'dragDoneField':
-
-            const newDoneItem:Task[] = [];
-              
-            const newDoneState = JSON.parse(this.dynamicStateStorage ?? '[]').filter((task:{id:string, name:string, bgColor:string, task:string})=>{
-                if (task.id === this.id) {
-                    newDoneItem.push(task);
-                    return false; // Убираем элемент из newTask
-                }
-                    return true; // Оставляем элемент в newTask
-              });
-
-            const currentInDoneTask = JSON.parse(localStorage.getItem("inDoneTask") || '[]');
-            const updatedInDoneTask = [...currentInDoneTask, ...newDoneItem];
-
-            this.storage = 'inDoneTask'
-
-            localStorage.setItem(this.prevStateStorage ?? '', JSON.stringify(newDoneState));
-            localStorage.setItem(this.storage, JSON.stringify(updatedInDoneTask));
-
-            break;
+            } catch (error) {
+                console.error("Error deleting task: ", error);
+            }
         }
-  
     }
     
-    @action deleteTask(taskToArray: string | null, id: string, storage: string | null) {
-        if (id && taskToArray && storage) {
-            const tasks = JSON.parse(taskToArray);
-            const deletedTask = tasks.filter((task:{id:string, name:string, bgColor:string, task:string}) => task.id !== id);
-            localStorage.setItem(storage, JSON.stringify(deletedTask));
-        }
-    }  
 }
 
 

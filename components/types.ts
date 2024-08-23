@@ -7,12 +7,13 @@ export interface ComponentTypes {
 export interface Iinput {
     type?:string;
     placeholder:string;
-    value:string
+    value?:string
     error?:string
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     textChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
     id?: string
-    label: string
+    label?: string
+    name?:string
 }
 
 

@@ -1,18 +1,19 @@
 'use client'
-import  styled  from './Textarea.module.scss'
+import  styles  from './Textarea.module.scss'
 import { Iinput } from '@/components/types'
 
 
-export const Textarea:React.FC<Iinput> = ({textChange, placeholder, error}) => {
+export const Textarea:React.FC<Iinput> = ({textChange, placeholder, error, label}) => {
   return (
-    <>
-       <textarea placeholder={placeholder} onChange={textChange} className={error ? styled.textareaError : styled.textarea }></textarea>
+    <label className={styles.label}>
+      {label}
+       <textarea placeholder={placeholder} onChange={textChange} className={error ? styles.textareaError : styles.textarea}></textarea>
     {
       error && (
-        <div className={styled.error}>{error}</div>
+        <div className={styles.error}>{error}</div>
       )
     }
-    </>
+    </label>
    
    
   );

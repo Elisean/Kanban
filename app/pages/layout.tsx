@@ -36,9 +36,6 @@ function DasboardLayout({
   const auth = getAuth(app);
 
   
-
-
-
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setUser(

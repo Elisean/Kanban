@@ -3,11 +3,11 @@
 import styles from './Input.module.scss'
 import { Iinput } from '@/components/types'
 
-export const Input:React.FC <Iinput> = ({onChange, type, placeholder, error, id, label, value}) =>{
+export const Input:React.FC <Iinput> = ({onChange, type, placeholder, error, id, label}) =>{
     return (
         <label className={styles.label} htmlFor={label}>
             {label}
-             <input placeholder={placeholder} type={type} value={value} id={id} className={error ? styles.inputError : styles.input} onChange={onChange}/>   
+             <input placeholder={placeholder} type={type}  id={id} className={error ? styles.inputError : styles.input} onChange={onChange}/>   
 
         {
             error && (
@@ -18,3 +18,4 @@ export const Input:React.FC <Iinput> = ({onChange, type, placeholder, error, id,
         </label>
     )
 }
+
