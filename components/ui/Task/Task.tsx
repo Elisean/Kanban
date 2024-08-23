@@ -9,11 +9,12 @@ import kanbanStore from '@/app/Store/kanbanStore';
 interface Itask{
     taskName:string;
     taskDescription:string;
-    draggable:boolean
+    draggable:boolean;
     id:string;
+    onDragStart?:any
 }
 
-export const Task: React.FC<Itask> = observer(({taskName, taskDescription, draggable, id}) => {
+export const Task: React.FC<Itask> = observer(({taskName, taskDescription, draggable, id, onDragStart}) => {
 
    
     const modalRef = useRef<HTMLDivElement>(null);
@@ -38,10 +39,11 @@ export const Task: React.FC<Itask> = observer(({taskName, taskDescription, dragg
 
 
     const closedModal = (id:string) =>{
-    
         kanbanStore.deleteTask(id)
         setChangeModal(false)
     }
+
+  
 
     return (
 
@@ -52,6 +54,7 @@ export const Task: React.FC<Itask> = observer(({taskName, taskDescription, dragg
             id={id}
             onMouseEnter={() => setRenderingButton(true)}
             onMouseLeave={() => setRenderingButton(false)}
+            onDragStart={onDragStart}
         >
             <div>   
                 <h3 className={styles.task__name}>{taskName}</h3>

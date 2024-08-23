@@ -26,8 +26,7 @@ class KanbanStore {
                 console.error("Error deleting task: ", error);
             }
         }
-    }
-    
+    }   
 }
 
 

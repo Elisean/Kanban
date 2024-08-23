@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import styles from './TaskFields.module.scss'
 import { observer } from 'mobx-react-lite';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getDatabase, onValue, ref as dbRef } from 'firebase/database';
+import { getDatabase, onValue, ref as dbRef, update } from 'firebase/database';
 import { Task } from '../ui/Task/Task';
 
 
 
 interface Task{
-    task:string
-    index:string
+    task:string;
+    index:string;
     taskId: string;
     taskDescription: string;
     taskName: string;
@@ -21,10 +21,9 @@ interface Task{
 export const TaskFields:React.FC = observer(() =>{
 
     const [startedTasks, setStartedTasks] = useState<Task[]>([]);
-
     const [progressTasks, setProgressTasks] = useState<Task[]>([]);
-
-    const [doneTask, setDoneTask] = useState<Task[]>([])
+    const [doneTask, setDoneTask] = useState<Task[]>([]);
+    const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
     useEffect(() => {
         const auth = getAuth();
@@ -35,28 +34,67 @@ export const TaskFields:React.FC = observer(() =>{
                 const tasksRef = dbRef(db, `tasks/${userId}`);
                 onValue(tasksRef, (snapshot) => {
                     const data = snapshot.val();
+                   
                     if (data) {
                         const tasksList = Object.keys(data).map(key => ({
-                            ...data[key]
+                            ...data[key],
                         }));
-                        setStartedTasks(tasksList);
+
+                        // Сортировка задач по статусам
+                        const started = tasksList.filter(task => task.taskStatus === 'in started');
+                        const progress = tasksList.filter(task => task.taskStatus === 'in progress');
+                        const done = tasksList.filter(task => task.taskStatus === 'done');
+
+                        setStartedTasks(started);
+                        setProgressTasks(progress);
+                        setDoneTask(done);
                     } else {
                         setStartedTasks([]);
+                        setProgressTasks([]);
+                        setDoneTask([]);
                     }
                 });
             } else {
                 setStartedTasks([]);
+                setProgressTasks([]);
+                setDoneTask([]);
             }
         });
     }, []);
 
+    const handleDragStart = (taskId: string) => {
+        setDraggedTaskId(taskId);
+        
+    };
 
+    const dropTask = (event: any) => {
+        event.preventDefault();
+        const locationTask = event.target.children[0].textContent.toLowerCase();
+        console.log('Dropped task location:', locationTask);
+        if (draggedTaskId) {
+            const auth = getAuth();
+            const user = auth.currentUser;
+            if (user) {
+                const db = getDatabase();
+                const taskRef = dbRef(db, `tasks/${user.uid}/${draggedTaskId}`);
+              update(taskRef, { taskStatus: locationTask })
+                    .then(() => {
+                        console.log('Task status updated successfully');
+                    })
+                    .catch((error) => {
+                        console.error('Error updating task status:', error);
+                    });
+            }
+
+        }
+        
+    };
 
     return (
 
             <div className={styles.kanbanFields}>
 
-                <ul className={styles.kanbanFields__field}>
+                <ul className={styles.kanbanFields__field} onDrop={(event:any) => dropTask(event)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>In started</p>
 
                       {startedTasks?.map((task, index) => (
@@ -65,13 +103,14 @@ export const TaskFields:React.FC = observer(() =>{
                             id={task.taskId}
                             taskDescription={task.taskDescription}
                             taskName={task.taskName}
+                            onDragStart={() => handleDragStart(task.taskId)}
                             draggable
                         />
                     ))}
 
                 </ul>
 
-                <ul className={styles.kanbanFields__field}>
+                <ul className={styles.kanbanFields__field} onDrop={(event:any) => dropTask(event)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>In progress</p>
                       {progressTasks?.map((task, index) => (
                         <Task
@@ -79,12 +118,13 @@ export const TaskFields:React.FC = observer(() =>{
                             id={task.taskId}
                             taskDescription={task.taskDescription}
                             taskName={task.taskName}
+                            onDragStart={() => handleDragStart(task.taskId)}
                             draggable
                         />
                     ))}
                 </ul>
 
-                <ul className={styles.kanbanFields__field}>
+                <ul className={styles.kanbanFields__field} onDrop={(event:any) => dropTask(event)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>Done</p>
                       {doneTask?.map((task, index) => (
                         <Task
@@ -92,6 +132,7 @@ export const TaskFields:React.FC = observer(() =>{
                             id={task.taskId}
                             taskDescription={task.taskDescription}
                             taskName={task.taskName}
+                            onDragStart={() => handleDragStart(task.taskId)}
                             draggable
                         />
                     ))}

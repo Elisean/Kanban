@@ -52,6 +52,7 @@ function Kanbanpage() {
                 taskId: taskRef.key,
                 taskName: tasks.taskName,
                 taskDescription: tasks.taskDescription,
+                taskStatus: 'in started',
                 createdAt: new Date().toISOString(),
             });
             setIsOpen(false);
