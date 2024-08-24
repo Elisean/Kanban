@@ -1,13 +1,10 @@
 'use client'
-
 import { useEffect, useState } from 'react';
 import styles from './TaskFields.module.scss'
 import { observer } from 'mobx-react-lite';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDatabase, onValue, ref as dbRef, update } from 'firebase/database';
 import { Task } from '../ui/Task/Task';
-
-
 
 interface Task{
     task:string;
@@ -67,34 +64,37 @@ export const TaskFields:React.FC = observer(() =>{
         
     };
 
-    const dropTask = (event: any) => {
+    const dropTask = (event: DragEvent) => {
         event.preventDefault();
-        const locationTask = event.target.children[0].textContent.toLowerCase();
-        console.log('Dropped task location:', locationTask);
-        if (draggedTaskId) {
-            const auth = getAuth();
-            const user = auth.currentUser;
-            if (user) {
-                const db = getDatabase();
-                const taskRef = dbRef(db, `tasks/${user.uid}/${draggedTaskId}`);
-              update(taskRef, { taskStatus: locationTask })
-                    .then(() => {
-                        console.log('Task status updated successfully');
-                    })
-                    .catch((error) => {
-                        console.error('Error updating task status:', error);
-                    });
-            }
-
-        }
         
+        if (event.target instanceof HTMLElement && event.target.children.length > 0) {
+            const locationTask = event.target.children[0].textContent?.toLowerCase();
+            console.log('Dropped task location:', locationTask);
+            if (draggedTaskId) {
+                const auth = getAuth();
+                const user = auth.currentUser;
+                if (user) {
+                    const db = getDatabase();
+                    const taskRef = dbRef(db, `tasks/${user.uid}/${draggedTaskId}`);
+                    update(taskRef, { taskStatus: locationTask })
+                        .then(() => {
+                            console.log('Task status updated successfully');
+                        })
+                        .catch((error) => {
+                            console.error('Error updating task status:', error);
+                        });
+                }
+            }
+        } else {
+            console.error('Invalid drop target');
+        }
     };
 
     return (
 
             <div className={styles.kanbanFields}>
 
-                <ul className={styles.kanbanFields__field} onDrop={(event:any) => dropTask(event)} onDragOver={(event) => event.preventDefault()}>
+                <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>In started</p>
 
                       {startedTasks?.map((task, index) => (
@@ -110,7 +110,7 @@ export const TaskFields:React.FC = observer(() =>{
 
                 </ul>
 
-                <ul className={styles.kanbanFields__field} onDrop={(event:any) => dropTask(event)} onDragOver={(event) => event.preventDefault()}>
+                <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>In progress</p>
                       {progressTasks?.map((task, index) => (
                         <Task
@@ -124,7 +124,7 @@ export const TaskFields:React.FC = observer(() =>{
                     ))}
                 </ul>
 
-                <ul className={styles.kanbanFields__field} onDrop={(event:any) => dropTask(event)} onDragOver={(event) => event.preventDefault()}>
+                <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>Done</p>
                       {doneTask?.map((task, index) => (
                         <Task

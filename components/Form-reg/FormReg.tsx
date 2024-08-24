@@ -2,7 +2,7 @@
 import React, { FC, useState } from 'react'
 import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
-import styled from './FormReg.module.scss'
+import styles from './FormReg.module.scss'
 import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, updateProfile} from 'firebase/auth'
 import { IUserData } from '../types';
 import { app } from '@/app/configs/firebase';
@@ -55,12 +55,9 @@ export const FormReg:FC = () => {
 
   };
   
-
-  
-
   return (
     <>
-            <form onSubmit={handleSubmit} className={styled.form}>
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <div>
                     <Input type='text' id='name' placeholder='Your full name' label='Name' value={userData.userName ?? ''} onChange={event => setUserData({...userData, userName:event.target.value})} />
                 </div>

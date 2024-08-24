@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import styles from './profile.module.scss';
 import Image from 'next/image'
 import { getAuth, onAuthStateChanged, reauthenticateWithCredential, updatePassword, updateProfile } from 'firebase/auth';
@@ -35,8 +35,8 @@ function Userpage() {
     return () => unsubscribeAuth();
   }, [auth]);
 
-  const handleFileChange = async (event: any) => {
-    const file = event.target.files[0];
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const url = await uploadUserImage(file);
       setImageUrl(url);

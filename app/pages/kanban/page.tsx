@@ -10,7 +10,7 @@ import { TaskFields } from '@/components/Task-fields/TaskFields';
 
 function Kanbanpage() {
     const [isOpen, setIsOpen] = useState(false);
-    const modalRef = useRef<any>(null);
+    const modalRef = useRef<HTMLFormElement>(null);
     const auth = getAuth();
 
     const [tasks, setTasks] = useState<any>({
@@ -84,56 +84,3 @@ export default Kanbanpage;
 
 
 
-// return (
-//     <div className={styles.kanban}>
-//     <div className={styles.kanban__wrapper}>
-//         <p>Board</p>
-       
-//         <ul className={styles.kanban__fields}>
-
-
-//             <div className={styles.kanban__field} onDragOver={(event) => event.preventDefault()}>
-
-//                 <p className={styles.kanban__fields_title}>In started</p>
-//                 {inStartedTasks.map(task => (
-//                     <li key={task.id} className={styles.kanban__field_task} draggable>
-//                         <strong>{task.taskName}</strong>
-//                         <p>{task.taskDescription}</p>
-//                     </li>
-//                 ))}
-
-//             </div>
-            
-//             <div className={styles.kanban__field} onDragOver={(event) => event.preventDefault()} >
-//                 <p className={styles.kanban__fields_title}>In progress</p>
-//                 {inProgressTasks.map(task => (
-//                     <li key={task.id} className={styles.kanban__field_task}  draggable>
-//                         <strong>{task.taskName}</strong>
-//                         <p>{task.taskDescription}</p>
-//                     </li>
-//                 ))}
-//             </div>
-
-//             <div className={styles.kanban__field} onDragOver={(event) => event.preventDefault()} >
-//                 <p className={styles.kanban__fields_title}>Done</p>
-//                 {doneTasks.map(task => (
-//                     <li key={task.id} className={styles.kanban__field_task}  draggable>
-//                         <strong>{task.taskName}</strong>
-//                         <p>{task.taskDescription}</p>
-//                     </li>
-//                 ))}
-//             </div>
-//         </ul>
-
-//         <Button id='add-card' onClick={() => setIsOpen(!isOpen)}>Add card</Button>
-//     </div>
-
-//     {isOpen && (
-//             <form action="#" className={styles.kanban__window} ref={modalRef} onSubmit={handleSubmit}>      
-//                 <Input type='text' id='task-name-input' placeholder='Task name' value={tasks.taskName} onChange={event => setTasks({...tasks, taskName:event.target.value})}/>
-//                 <Textarea id='task-description-input' placeholder='Task description' value={tasks.taskDescription} textChange={event => setTasks({...tasks, taskDescription:event.target.value})} />
-//                 <Button id='add-task' type='submit'>Add task</Button>
-//             </form>
-//     )}
-// </div>
-// );
