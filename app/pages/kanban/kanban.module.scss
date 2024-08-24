@@ -18,3 +18,18 @@
         padding: 15px;
     }
 }
+.colorsWrapper{
+    display: flex;
+    align-items: center;
+    margin: 20px 0 0 0;
+}
+.colorsPalette{
+    display: flex;
+}
+.colorsOption{
+    width: 22px;
+    height: 22px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}

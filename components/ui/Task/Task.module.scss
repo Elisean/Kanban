@@ -46,4 +46,11 @@
         line-height: 26px;
         margin: 0 0 20px 0;
     }
+    &__dateWrapper{
+        display: flex;
+        justify-content: space-between;
+        font-size: 18px;
+        margin: 20px 0 0 0;
+    }
+   
 }

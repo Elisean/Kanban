@@ -41,7 +41,7 @@ export const FormReg:FC = () => {
     }
 
     onAuthStateChanged(auth, () => {
-      router.push('pages/dashboard'); 
+      router.push('pages/kanban'); 
     });
 
     setUserData({

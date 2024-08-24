@@ -86,21 +86,6 @@ function DasboardLayout({
             <ul className={styles.aside__list}>
               <li className={styles.aside__item}>
                 <Link
-                  href={`/pages/dashboard`}
-                  className={`${
-                    pathname === `/pages/dashboard`
-                      ? `${styles.aside__item_active_link}`
-                      : `${styles.aside__item}`
-                  }`}
-                >
-                  <div className={styles.iconWrapper} style={pathname === '/pages/dashboard' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
-                    <HomeIcon />
-                  </div>
-                  Dashboard
-                </Link>
-              </li>
-              <li className={styles.aside__item}>
-                <Link
                   href={`/pages/kanban`}
                   className={`${
                     pathname === `/pages/kanban`

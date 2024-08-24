@@ -11,12 +11,26 @@ interface Itask{
     taskDescription:string;
     draggable:boolean;
     id:string;
-    onDragStart?:any
+    onDragStart?:any;
+    bgColor:string;
+    date:string;
 }
 
-export const Task: React.FC<Itask> = observer(({taskName, taskDescription, draggable, id, onDragStart}) => {
+export const Task: React.FC<Itask> = observer(({taskName, taskDescription, draggable, id, onDragStart, bgColor, date}) => {
+    
+    const newDate = new Date(date);
 
-   
+
+    const year = newDate.getFullYear();
+    const month = String(newDate.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+    const day = String(newDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`
+
+
+    const hours = String(newDate.getHours()).padStart(2, '0');
+    const minutes = String(newDate.getMinutes()).padStart(2, '0');
+    const formattedTime = `${hours}:${minutes}`;
+
     const modalRef = useRef<HTMLDivElement>(null);
 
     const [changeModal, setChangeModal] = useState(false);
@@ -43,8 +57,6 @@ export const Task: React.FC<Itask> = observer(({taskName, taskDescription, dragg
         setChangeModal(false)
     }
 
-  
-
     return (
 
     <>
@@ -55,10 +67,20 @@ export const Task: React.FC<Itask> = observer(({taskName, taskDescription, dragg
             onMouseEnter={() => setRenderingButton(true)}
             onMouseLeave={() => setRenderingButton(false)}
             onDragStart={onDragStart}
+            style={{ backgroundColor: bgColor}}
         >
             <div>   
                 <h3 className={styles.task__name}>{taskName}</h3>
                 <p className={styles.task__description}>{taskDescription}</p>
+            </div>
+            <div className={styles.task__dateWrapper}>
+                <div className={styles.task__date}>
+                    {formattedDate}
+                </div>
+                <div className={styles.task__time}>
+                    {formattedTime}
+                </div>
+                   
             </div>
         
           {renderingButton && (

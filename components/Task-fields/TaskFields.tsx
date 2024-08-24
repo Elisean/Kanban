@@ -12,6 +12,8 @@ interface Task{
     taskId: string;
     taskDescription: string;
     taskName: string;
+    taskColor:string;
+    createdAt:string;
 }
 
 
@@ -99,6 +101,8 @@ export const TaskFields:React.FC = observer(() =>{
 
                       {startedTasks?.map((task, index) => (
                         <Task
+                            date={task.createdAt}
+                            bgColor={task.taskColor}
                             key={index} 
                             id={task.taskId}
                             taskDescription={task.taskDescription}
@@ -114,6 +118,8 @@ export const TaskFields:React.FC = observer(() =>{
                       <p className={styles.kanbanFields__titles}>In progress</p>
                       {progressTasks?.map((task, index) => (
                         <Task
+                            date={task.createdAt}
+                            bgColor={task.taskColor}
                             key={index} 
                             id={task.taskId}
                             taskDescription={task.taskDescription}
@@ -128,6 +134,8 @@ export const TaskFields:React.FC = observer(() =>{
                       <p className={styles.kanbanFields__titles}>Done</p>
                       {doneTask?.map((task, index) => (
                         <Task
+                            date={task.createdAt}
+                            bgColor={task.taskColor}
                             key={index} 
                             id={task.taskId}
                             taskDescription={task.taskDescription}

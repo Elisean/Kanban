@@ -8,9 +8,12 @@ import { getDatabase, ref as dbRef, push, set } from "firebase/database";
 import { getAuth } from 'firebase/auth'
 import { TaskFields } from '@/components/Task-fields/TaskFields';
 
+
+const colors = ['#E93636', '#44AE41', '#1853E9', '#FF7A00', '#717171'];
 function Kanbanpage() {
     const [isOpen, setIsOpen] = useState(false);
     const modalRef = useRef<HTMLFormElement>(null);
+    const [color, setColor] = useState('');
     const auth = getAuth();
 
     const [tasks, setTasks] = useState<any>({
@@ -53,6 +56,7 @@ function Kanbanpage() {
                 taskName: tasks.taskName,
                 taskDescription: tasks.taskDescription,
                 taskStatus: 'in started',
+                taskColor: color,
                 createdAt: new Date().toISOString(),
             });
             setIsOpen(false);
@@ -64,7 +68,7 @@ function Kanbanpage() {
     return (
         <div className={styles.kanban}>
             <div className={styles.kanban__wrapper}>
-                <p>Board</p>
+                <h1>Board</h1>
                 <TaskFields />
                 <Button id='add-card' onClick={() => setIsOpen(!isOpen)}>Add card</Button>
             </div>
@@ -73,7 +77,17 @@ function Kanbanpage() {
                 <form action="#" className={styles.kanban__window} ref={modalRef} onSubmit={handleSubmit}>
                     <Input type='text' id='task-name-input' placeholder='Task name' value={tasks.taskName} onChange={event => setTasks({ ...tasks, taskName: event.target.value })} />
                     <Textarea id='task-description-input' placeholder='Task description' value={tasks.taskDescription} textChange={event => setTasks({ ...tasks, taskDescription: event.target.value })} />
-                    <Button id='add-task' type='submit'>Add task</Button>
+                    <div className={styles.colorsWrapper}>
+                        <div className={styles.colorsPalette}>
+                            {
+                                colors.map((color: string, id: number) => {
+                                    return <div className={styles.colorsOption} key={id} style={{ backgroundColor: color }} onClick={() => setColor(color)}></div>
+                                })
+                            }
+                        </div>
+                            <Button id='add-task' type='submit'>Add task</Button>
+                    </div>
+                  
                 </form>
             )}
         </div>
