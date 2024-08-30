@@ -1,6 +1,12 @@
+@import '../../app/variables.scss';
+
 .header{
     position: absolute;
     width: 100%;
     display: flex;
     justify-content: space-between;
+    background-color: #fff;
+    background: $secondary;
+    z-index: 1;
+    height: 70px;
 }

@@ -1,9 +1,7 @@
 "use client";
 import styles from "./layout.module.scss";
-import { Aside } from "@/components/Aside/Aside";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import Link from "next/link";
-import HomeIcon from '@/public/static/home.svg';
 import ProfileIcon from '@/public/static/profile.svg';
 import KanbanIcon from '@/public/static/kanban-board.svg';
 import SignOutIcon from '@/public/static/sign-out.svg';
@@ -16,11 +14,15 @@ import { app } from "../configs/firebase";
 import { useEffect, useState } from "react";
 import Image from 'next/image'
 import {getUserImageURL } from '../configs/uploadImageFireBase'; 
+import { Header } from "@/components/Header/Header";
 
 
-const plusJakartaSansFonts = Plus_Jakarta_Sans({
+const plusJakartaSansFonts = Montserrat({
   subsets: ["latin", "cyrillic-ext"],
 });
+
+
+
 
 function DasboardLayout({
   children,
@@ -28,7 +30,7 @@ function DasboardLayout({
   children: React.ReactNode;
 }) {
   
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<any>(null);
   const [imageUrl, setImageUrl] = useState('')
   
   const pathname = usePathname();
@@ -76,61 +78,68 @@ function DasboardLayout({
   }, [user]);
 
 
- 
-
   return (
     <main className={plusJakartaSansFonts.className}>
       <section className={styles.wrapper}>
-        <div className={styles.inner}>
-          <Aside>
-            <ul className={styles.aside__list}>
-              <li className={styles.aside__item}>
-                <Link
-                  href={`/pages/kanban`}
-                  className={`${
-                    pathname === `/pages/kanban`
-                      ? `${styles.aside__item_active_link}`
-                      : `${styles.aside__item}`
-                  }`}
-                >
-                  <div className={styles.iconWrapper} style={pathname === '/pages/kanban' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
-                    <KanbanIcon />
-                  </div>
-                  Kanban
-                </Link>
-              </li>
-              <li className={styles.aside__item}>
-                <Link
-                  href={`/pages/profile`}
-                  className={`${
-                    pathname === `/pages/profile`
-                      ? `${styles.aside__item_active_link}`
-                      : `${styles.aside__item}`
-                  }`}
-                >
-                  <div className={styles.iconWrapper} style={pathname === '/pages/profile' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
-                    <ProfileIcon />
-                  </div>
-                  Profile
-                </Link>
-              </li>
-            </ul>
-            <div className={styles.aside__action_user}>
-              <Button id='sign-out' type="button" onClick={handleSignOut}>
-                <SignOutIcon />
-              </Button>
-              <div className={styles.aside__action_inner}>
-                 <Link href={`/pages/profile`} className={styles.aside__avatar}>
-                 {
-                  imageUrl ? <Image src={imageUrl} alt='avatar' width={50} height={50}/> :  <UserIcon /> 
-                 } 
-                 </Link>
-                {user ? <p>{user.displayName}</p> : <p>Loading...</p>}
+        <Header>
+          <div className='container'>
+       <div className={styles.header__wrapper}>
+          <div className={styles.header__logo}>
+          Elisean Kanban 
+          </div>
+            <ul className={styles.header__list}>
+                <li className={styles.header__item}>
+                  <Link
+                    href={`/pages/kanban`}
+                    className={`${
+                      pathname === `/pages/kanban`
+                        ? `${styles.header__item_active_link}`
+                        : `${styles.header__item}`
+                    }`}
+                  >
+                    <div className={styles.iconWrapper} style={pathname === '/pages/kanban' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
+                      <KanbanIcon />
+                    </div>
+                    Kanban
+                  </Link>
+                </li>
+                <li className={styles.header__item}>
+                  <Link
+                    href={`/pages/profile`}
+                    className={`${
+                      pathname === `/pages/profile`
+                        ? `${styles.header__item_active_link}`
+                        : `${styles.header__item}`
+                    }`}
+                  >
+                    <div className={styles.iconWrapper} style={pathname === '/pages/profile' ? { background: '#0075FF' } : { background: '#1A1F37' }}>
+                      <ProfileIcon />
+                    </div>
+                    Profile
+                  </Link>
+                </li>
+              </ul>
+              <div className={styles.header__action_user}>
+                <Button id='sign-out' type="button" onClick={handleSignOut}>
+                  <SignOutIcon />
+                </Button>
+                <div className={styles.header__action_inner}>
+                  <Link href={`/pages/profile`} className={styles.header__avatar}>
+                  {
+                    imageUrl ? <Image src={imageUrl} alt='avatar' width={50} height={50}/> :  <UserIcon /> 
+                  } 
+                  </Link>
+                  {user ? <p className={styles.header__user_name}>{user.displayName}</p> : <p className={styles.header__user_name}>Loading...</p>}
+                </div>
               </div>
+          </div>
+         </div>
+          </Header>
+          <div className={styles.inner}>
+            <div className='container'>
+              {children}
             </div>
-          </Aside>
-          <div className={styles.container}>{children}</div>
-        </div>
+          </div>
       </section>
     </main>
   );

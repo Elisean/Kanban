@@ -97,8 +97,8 @@ export const TaskFields:React.FC = observer(() =>{
             <div className={styles.kanbanFields}>
 
                 <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
-                      <p className={styles.kanbanFields__titles}>In started</p>
-
+                            <p className={styles.kanbanFields__titles}>In started</p>
+                            <span>{startedTasks.length}</span>
                       {startedTasks?.map((task, index) => (
                         <Task
                             date={task.createdAt}
@@ -116,6 +116,7 @@ export const TaskFields:React.FC = observer(() =>{
 
                 <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>In progress</p>
+                      <span>{progressTasks.length}</span>
                       {progressTasks?.map((task, index) => (
                         <Task
                             date={task.createdAt}
@@ -132,6 +133,7 @@ export const TaskFields:React.FC = observer(() =>{
 
                 <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
                       <p className={styles.kanbanFields__titles}>Done</p>
+                      <span>{doneTask.length}</span>
                       {doneTask?.map((task, index) => (
                         <Task
                             date={task.createdAt}
