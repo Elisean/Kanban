@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
 import styles from './TaskFields.module.scss'
-import { observer } from 'mobx-react-lite';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDatabase, onValue, ref as dbRef, update } from 'firebase/database';
 import { Task } from '../ui/Task/Task';
@@ -17,7 +16,7 @@ interface Task{
 }
 
 
-export const TaskFields:React.FC = observer(() =>{
+export const TaskFields:React.FC = () =>{
 
     const [startedTasks, setStartedTasks] = useState<Task[]>([]);
     const [progressTasks, setProgressTasks] = useState<Task[]>([]);
@@ -151,4 +150,4 @@ export const TaskFields:React.FC = observer(() =>{
             </div>
       
     );
-})
+}

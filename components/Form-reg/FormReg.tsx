@@ -1,14 +1,18 @@
 'use client'
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Input } from '@/components/ui/Input/Input';
 import { Button } from '@/components/ui/Button/Button';
 import styles from './FormReg.module.scss'
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, updateProfile} from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signOut, updateProfile} from 'firebase/auth'
 import { IUserData } from '../types';
 import { app } from '@/app/configs/firebase';
 import { useRouter, usePathname } from 'next/navigation';
+import { observer } from 'mobx-react-lite';
+import authStore from '@/app/Store/authStore';
 
-export const FormReg:FC = () => {
+
+
+export const FormReg:FC = observer(() => {
 
   const [userData, setUserData] = useState<IUserData>({
     userName: '',
@@ -17,31 +21,45 @@ export const FormReg:FC = () => {
 
 } as IUserData)
 
+
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+
   const auth = getAuth(app);
 
   const router = useRouter();
 
   const pathName = usePathname()
 
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
+    if (!userData.userPassword) {
+      alert('Password is required');
+      return;
+    }
+
     try {
       const res = await createUserWithEmailAndPassword(
         auth,
         userData.userEmail,
         userData.userPassword,
       );
+
       await updateProfile(res.user, {
         displayName: userData.userName
       });
+      await signOut(auth);
 
     } catch (error) {
       console.log(error);
     }
 
     onAuthStateChanged(auth, () => {
-      router.push('pages/kanban'); 
+      if(auth){
+        alert('User registered successfully');
+      }
+      authStore.isAuth(true);
     });
 
     setUserData({
@@ -49,11 +67,20 @@ export const FormReg:FC = () => {
       userEmail: '',
       userPassword: ''
   })
+};
 
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user && registrationSuccess) {
+      alert('User registered successfully');
+      authStore.isAuth(true);
+      setRegistrationSuccess(false); // Сбросить флаг после отображения сообщения
+    }
+  });
 
-  
+  return () => unsubscribe(); // Отписаться от onAuthStateChanged при размонтировании компонента
+}, [auth, registrationSuccess]);
 
-  };
   
   return (
     <>
@@ -72,7 +99,7 @@ export const FormReg:FC = () => {
     </>
        
   )
-}
+})
 
 
 
