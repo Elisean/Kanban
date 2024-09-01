@@ -1,23 +1,19 @@
-'use client'
-import { useEffect, useState } from 'react';
-import styles from './TaskFields.module.scss'
+import React, { useEffect, useState } from 'react';
+import styles from './TaskFields.module.scss';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDatabase, onValue, ref as dbRef, update } from 'firebase/database';
 import { Task } from '../ui/Task/Task';
 
-interface Task{
-    task:string;
-    index:string;
+interface Task {
     taskId: string;
     taskDescription: string;
     taskName: string;
-    taskColor:string;
-    createdAt:string;
+    taskColor: string;
+    createdAt: string;
+    taskStatus: string;
 }
 
-
-export const TaskFields:React.FC = () =>{
-
+export const TaskFields: React.FC = () => {
     const [startedTasks, setStartedTasks] = useState<Task[]>([]);
     const [progressTasks, setProgressTasks] = useState<Task[]>([]);
     const [doneTask, setDoneTask] = useState<Task[]>([]);
@@ -32,13 +28,11 @@ export const TaskFields:React.FC = () =>{
                 const tasksRef = dbRef(db, `tasks/${userId}`);
                 onValue(tasksRef, (snapshot) => {
                     const data = snapshot.val();
-                   
                     if (data) {
                         const tasksList = Object.keys(data).map(key => ({
                             ...data[key],
                         }));
 
-                        // Сортировка задач по статусам
                         const started = tasksList.filter(task => task.taskStatus === 'in started');
                         const progress = tasksList.filter(task => task.taskStatus === 'in progress');
                         const done = tasksList.filter(task => task.taskStatus === 'done');
@@ -62,92 +56,80 @@ export const TaskFields:React.FC = () =>{
 
     const handleDragStart = (taskId: string) => {
         setDraggedTaskId(taskId);
-        
     };
 
-    const dropTask = (event: DragEvent) => {
+    const dropTask = (event: React.DragEvent<HTMLUListElement>) => {
         event.preventDefault();
-        
-        if (event.target instanceof HTMLElement && event.target.children.length > 0) {
-            const locationTask = event.target.children[0].textContent?.toLowerCase();
-            console.log('Dropped task location:', locationTask);
-            if (draggedTaskId) {
-                const auth = getAuth();
-                const user = auth.currentUser;
-                if (user) {
-                    const db = getDatabase();
-                    const taskRef = dbRef(db, `tasks/${user.uid}/${draggedTaskId}`);
-                    update(taskRef, { taskStatus: locationTask })
-                        .then(() => {
-                            console.log('Task status updated successfully');
-                        })
-                        .catch((error) => {
-                            console.error('Error updating task status:', error);
-                        });
-                }
+        const locationTask = event.currentTarget.dataset.status;
+        if (draggedTaskId) {
+            const auth = getAuth();
+            const user = auth.currentUser;
+            if (user) {
+                const db = getDatabase();
+                const taskRef = dbRef(db, `tasks/${user.uid}/${draggedTaskId}`);
+                update(taskRef, { taskStatus: locationTask })
+                    .then(() => {
+                        console.log('Task status updated successfully');
+                    })
+                    .catch((error) => {
+                        console.error('Error updating task status:', error);
+                    });
             }
-        } else {
-            console.error('Invalid drop target');
         }
     };
 
     return (
+        <div className={styles.kanbanFields}>
+            <ul className={styles.kanbanFields__field} data-status="in started" onDrop={dropTask} onDragOver={(event) => event.preventDefault()}>
+                <p className={styles.kanbanFields__titles}>In started</p>
+                <span className={styles.kanbanFields__count}>{startedTasks.length}</span>
+                {startedTasks?.map((task, index) => (
+                    <Task
+                        date={task.createdAt}
+                        bgColor={task.taskColor}
+                        key={index}
+                        id={task.taskId}
+                        taskDescription={task.taskDescription}
+                        taskName={task.taskName}
+                        onDragStart={() => handleDragStart(task.taskId)}
+                        draggable
+                    />
+                ))}
+            </ul>
 
-            <div className={styles.kanbanFields}>
+            <ul className={styles.kanbanFields__field} data-status="in progress" onDrop={dropTask} onDragOver={(event) => event.preventDefault()}>
+                <p className={styles.kanbanFields__titles}>In progress</p>
+                <span className={styles.kanbanFields__count}>{progressTasks.length}</span>
+                {progressTasks?.map((task, index) => (
+                    <Task
+                        date={task.createdAt}
+                        bgColor={task.taskColor}
+                        key={index}
+                        id={task.taskId}
+                        taskDescription={task.taskDescription}
+                        taskName={task.taskName}
+                        onDragStart={() => handleDragStart(task.taskId)}
+                        draggable
+                    />
+                ))}
+            </ul>
 
-                <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
-                            <p className={styles.kanbanFields__titles}>In started</p>
-                            <span>{startedTasks.length}</span>
-                      {startedTasks?.map((task, index) => (
-                        <Task
-                            date={task.createdAt}
-                            bgColor={task.taskColor}
-                            key={index} 
-                            id={task.taskId}
-                            taskDescription={task.taskDescription}
-                            taskName={task.taskName}
-                            onDragStart={() => handleDragStart(task.taskId)}
-                            draggable
-                        />
-                    ))}
-
-                </ul>
-
-                <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
-                      <p className={styles.kanbanFields__titles}>In progress</p>
-                      <span>{progressTasks.length}</span>
-                      {progressTasks?.map((task, index) => (
-                        <Task
-                            date={task.createdAt}
-                            bgColor={task.taskColor}
-                            key={index} 
-                            id={task.taskId}
-                            taskDescription={task.taskDescription}
-                            taskName={task.taskName}
-                            onDragStart={() => handleDragStart(task.taskId)}
-                            draggable
-                        />
-                    ))}
-                </ul>
-
-                <ul className={styles.kanbanFields__field} onDrop={(event:React.DragEvent<HTMLUListElement>) => dropTask(event.nativeEvent)} onDragOver={(event) => event.preventDefault()}>
-                      <p className={styles.kanbanFields__titles}>Done</p>
-                      <span>{doneTask.length}</span>
-                      {doneTask?.map((task, index) => (
-                        <Task
-                            date={task.createdAt}
-                            bgColor={task.taskColor}
-                            key={index} 
-                            id={task.taskId}
-                            taskDescription={task.taskDescription}
-                            taskName={task.taskName}
-                            onDragStart={() => handleDragStart(task.taskId)}
-                            draggable
-                        />
-                    ))}
-                </ul>
-
-            </div>
-      
+            <ul className={styles.kanbanFields__field} data-status="done" onDrop={dropTask} onDragOver={(event) => event.preventDefault()}>
+                <p className={styles.kanbanFields__titles}>Done</p>
+                <span className={styles.kanbanFields__count}>{doneTask.length}</span>
+                {doneTask?.map((task, index) => (
+                    <Task
+                        date={task.createdAt}
+                        bgColor={task.taskColor}
+                        key={index}
+                        id={task.taskId}
+                        taskDescription={task.taskDescription}
+                        taskName={task.taskName}
+                        onDragStart={() => handleDragStart(task.taskId)}
+                        draggable
+                    />
+                ))}
+            </ul>
+        </div>
     );
-}
+};

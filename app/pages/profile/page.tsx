@@ -95,7 +95,7 @@ function Userpage() {
 
   return (
     <section className={styles.userPage}>
-      <h1>Profile</h1>
+      <h1 className={styles.userPage__title}>Profile</h1>
       <div className={styles.userWraper}>
         <div className={styles.userAvatar}>
           <label htmlFor="file" className={styles.imageWrapper}>
