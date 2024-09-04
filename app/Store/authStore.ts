@@ -10,8 +10,7 @@ class AuthStore {
     }
 
    @action isAuth(auth:boolean){
-    this.ISAUTH = auth;
-    console.log(this.ISAUTH);
+        this.ISAUTH = auth;
    }
 
 }

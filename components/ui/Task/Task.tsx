@@ -56,6 +56,24 @@ export const Task: React.FC<Itask> = observer(({taskName, taskDescription, dragg
         kanbanStore.deleteTask(id)
         setChangeModal(false)
     }
+   
+ 
+
+    const hexToRgba = (hex: string | null | undefined, alpha: number = 1): string => {
+        if (!hex || typeof hex !== 'string' || !hex.match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i)) {
+            hex = '#ffffff'; // Устанавливаем белый цвет по умолчанию
+        }
+    
+        hex = hex.replace('#', '');
+        const match = hex.match(/\w\w/g);
+        if (!match) {
+            throw new Error('Invalid hex color');
+        }
+        const [r, g, b] = match.map(c => parseInt(c, 16));
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
+
 
     return (
 
@@ -67,7 +85,7 @@ export const Task: React.FC<Itask> = observer(({taskName, taskDescription, dragg
             onMouseEnter={() => setRenderingButton(true)}
             onMouseLeave={() => setRenderingButton(false)}
             onDragStart={onDragStart}
-            style={{ backgroundColor: bgColor}}
+            style={{ borderColor: bgColor, borderWidth: '3px', borderStyle: 'solid', background: hexToRgba(bgColor, 0.2), color: bgColor || '#fff' }}
         >
             <div>   
                 <h3 className={styles.task__name}>{taskName}</h3>
