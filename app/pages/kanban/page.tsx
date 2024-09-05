@@ -9,7 +9,7 @@ import { getAuth } from 'firebase/auth'
 import { TaskFields } from '@/components/Task-fields/TaskFields';
 
 
-const colors = ['#E93636', '#44AE41', '#1853E9', '#FF7A00', '#717171'];
+const colors = ['#E93636', '#44AE41', '#12ddeb', '#FF7A00', '#e2fa07'];
 function Kanbanpage() {
     const [isOpen, setIsOpen] = useState(false);
     const modalRef = useRef<HTMLFormElement>(null);
